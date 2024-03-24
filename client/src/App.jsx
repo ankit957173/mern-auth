@@ -6,10 +6,14 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Profile from './pages/Profile';
 import PageNotFound from './pages/PageNotFound';
+import Header from './components/Header';
 
 export default function App() {
   return (
     < BrowserRouter>
+
+      {/* header */}
+      <Header />
       <Routes>
 
         <Route path='/' element={<Home />} />
