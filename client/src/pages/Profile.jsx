@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from '../firebase'
 import { useDispatch } from 'react-redux';
-import { updateUserStart, updateUserSuccess, updateUserFailure } from '../redux/user/userSlice';
+import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserSuccess, deleteUserStart } from '../redux/user/userSlice';
 
 export default function Profile() {
     const dispatch = useDispatch()
@@ -68,6 +68,24 @@ export default function Profile() {
             // console.log(error);
         }
     };
+    const handleDelete = async () => {
+        try {
+            dispatch(deleteUserStart());
+            const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+                method: "DELETE",
+            });
+            const data = await res.json();
+            if (data.success === false) {
+                dispatch(deleteUserFailure(data));
+                return;
+            }
+            dispatch(deleteUserSuccess(data));
+            // deleteUserStart(true);
+        } catch (error) {
+            dispatch(deleteUserFailure(error));
+            // console.log(error);
+        }
+    };
     return (
         <div className='p-3 max-w-lg mx-auto'>
             <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
@@ -105,7 +123,8 @@ export default function Profile() {
                  uppercase hover:opacity-90 disabled:opacity-80'> {loading ? 'Loading...' : 'Update'}</button>
             </form>
             <div className="flex justify-between mt-3">
-                <span className="bg-transparent hover:bg-red-500 text-white-700 font-semibold hover:text-white py-2 px-4 border border-black-500 hover:border-transparent cursor-pointer rounded">Delete Account</span>
+                <span className="bg-transparent hover:bg-red-500 text-white-700 font-semibold hover:text-white py-2 px-4 border border-black-500 hover:border-transparent cursor-pointer rounded"
+                    onClick={handleDelete}>Delete Account</span>
                 <span className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded cursor-pointer">Sign out</span>
             </div>
             <p className='text-green-700'>{loading && "Updating profile..."}</p>
