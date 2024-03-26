@@ -34,7 +34,7 @@ export const signin = async (req, res, next) => {
 
         //add cookeies
         res
-            .cookie('access_tokern', token, { httpOnly: true, maxAge: 60 * 60 * 1000 })
+            .cookie('access_token', token, { httpOnly: true, maxAge: 60 * 60 * 1000 })
             .status(200)
             .json(others);
     } catch (error) {
@@ -50,7 +50,7 @@ export const google = async (req, res, next) => {
             const { password: hashedPassword, ...others } = user._doc;
             const expiryDate = new Date(Date.now() + 60 * 60 * 1000);
             res
-                .cookie('access_tokern', token, { httpOnly: true, expires: expiryDate })
+                .cookie('access_token', token, { httpOnly: true, expires: expiryDate })
                 .status(200)
                 .json(user._doc);
         }
