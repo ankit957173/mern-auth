@@ -109,7 +109,7 @@ export default function Profile() {
       request.resource.contentType.matches('image/.*');
     } */}
                 <input type="file" ref={fileRef} className="hidden"
-                    accept='image/*' onChange={(e) => setImage(e.target.files[0])} />
+                    accept='image/*' onChange={(e) => { setImageError(false); setImage(e.target.files[0]) }} />
                 <img src={formData.profilePicture || currentUser.profilePicture}
                     alt="profile"
                     className='h-24 w-24 self-center 
@@ -117,7 +117,7 @@ export default function Profile() {
                     onClick={() => fileRef.current.click()} />
                 <p className='text-sm self-center'>{imageError ? (
                     <span className='text-red-700'>Error uploading image(file
-                        must be less than 3)</span>
+                        must be less than 5 MB)</span>
                 ) : imagePercent > 0 && imagePercent < 100 ? (
                     <span className='text-slate-700'>{`Uploading: ${imagePercent}%`}</span>
                 ) : imagePercent === 100 ? (
