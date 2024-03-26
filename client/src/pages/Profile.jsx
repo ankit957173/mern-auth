@@ -2,8 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from '../firebase'
+import { useDispatch } from 'react-redux';
+import { updateUserStart, updateUserSuccess, updateUserFailure } from '../redux/user/userSlice';
 
 export default function Profile() {
+    const dispatch = useDispatch()
     const fileRef = useRef(null);
     const { currentUser, loading, error } = useSelector((state) => state.user);
 
@@ -41,10 +44,34 @@ export default function Profile() {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
     };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            dispatch(updateUserStart());
+            const res = await fetch(`/api/user/update/${currentUser._id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+            if (data.success === false) {
+                dispatch(updateUserFailure(data));
+                return;
+            }
+            dispatch(updateUserSuccess(data));
+            setUpdateSuccess(true);
+
+        } catch (error) {
+            dispatch(updateUserFailure(error));
+            // console.log(error);
+        }
+    };
     return (
         <div className='p-3 max-w-lg mx-auto'>
             <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
-            <form className='flex flex-col gap-4'>
+            <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
                 {/* useRef reference ke liye kaam aata h file ka ref image se h yaha */}
                 {/** firebase storage rules 
                   match /{allPaths=**} {
@@ -71,9 +98,9 @@ export default function Profile() {
                     : ('')}
 
                 </p>
-                <input value={currentUser.username} type="text" id='username' placeholder='Username' className='bg-slate-100 rounded-lg p-3' onClick={handleChange} />
-                <input value={currentUser.email} type="email" id='email' placeholder='Email' className='bg-slate-100 rounded-lg p-3' onClick={handleChange} />
-                <input type="password" id='password' placeholder='Password' className='bg-slate-100 rounded-lg p-3' onClick={handleChange} />
+                <input defaultValue={currentUser.username} type="text" id='username' placeholder='Username' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
+                <input defaultValue={currentUser.email} type="email" id='email' placeholder='Email' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
+                <input type="password" id='password' placeholder='Password' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
                 <button className='bg-slate-700 text-white p-3 rounded-lg
                  uppercase hover:opacity-90 disabled:opacity-80'> {loading ? 'Loading...' : 'Update'}</button>
             </form>
@@ -81,6 +108,9 @@ export default function Profile() {
                 <span className="bg-transparent hover:bg-red-500 text-white-700 font-semibold hover:text-white py-2 px-4 border border-black-500 hover:border-transparent cursor-pointer rounded">Delete Account</span>
                 <span className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded cursor-pointer">Sign out</span>
             </div>
+            <p className='text-green-700'>{loading && "Updating profile..."}</p>
+            <p className='text-green-700'>{updateSuccess && "Profile updated successfully!"}</p>
+            <p className='text-red-700'>{error && "Something went wrong!"}</p>
         </div>
     )
 }
