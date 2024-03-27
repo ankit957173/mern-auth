@@ -10,6 +10,8 @@ lerna-debug.log*
 .env
 
 node_modules
+dist
+client/dist
 dist-ssr
 *.local
 
