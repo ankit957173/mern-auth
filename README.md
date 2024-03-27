@@ -10,7 +10,7 @@ This application is intended as a starting point for building full-stack web app
 
 ## Live Demo
 
-The application is deployed at https://mern-auth-axuo.onrender.com/
+The application is deployed at https://mern-auth-axuo.onrender.com/ and vercel at https://mern-auth-ankit-singh-tanwars-projects.vercel.app/
 
 ## Environment Variables
 
