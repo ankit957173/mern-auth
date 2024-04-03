@@ -1,15 +1,22 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
+import { useState, useEffect } from "react";
+import { signInStart, signInSuccess, signInFailure, clearError } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import OAuth from "../components/OAuth";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export default function SignIn() {
   const [formData, setFormData] = useState({});
   const { loading, error } = useSelector((state) => state.user);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Dispatch an action to clear the error when the component mounts or when the page is refreshed
+    dispatch(clearError());
+  }, [dispatch]);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -42,6 +49,8 @@ export default function SignIn() {
     }
 
     //reset the form data to empty on submit
+    // reset the error to false
+
   };
 
   return (
@@ -80,7 +89,11 @@ export default function SignIn() {
           <span className="text-blue-500">Sign Up</span>
         </Link>
       </div>
-      <p className="text-red-700 mt-3">{error ? error.error || "Something went wrong" : ''}</p>
+      <p className="text-red-700 mt-3">{error ? error.error || "Something went wrong in signin" : ''}</p>
+      {/* toast the error and show the error in toast */}
+
+
+
     </div>
   );
 }

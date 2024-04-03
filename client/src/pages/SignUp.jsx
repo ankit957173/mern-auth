@@ -1,12 +1,19 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { signUpFailure, signUpStart, signUpSuccess, clearError } from "../redux/user/userSlice";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import OAuth from "../components/OAuth";
 export default function SignUp() {
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(false);
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    // Dispatch an action to clear the error when the component mounts or when the page is refreshed
+    dispatch(clearError());
+  }, [dispatch]);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -15,8 +22,7 @@ export default function SignUp() {
     //isme puri url se bhi kr skte the lekin ab half url vite.config.js me daal diye as a proxy
 
     try {
-      setLoading(true);
-      setError(false);
+      dispatch(signUpStart());
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
@@ -25,16 +31,24 @@ export default function SignUp() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      setLoading(false);
+
       //jaisa ki hum fetch use kr rhe h to hum setError ko ese set krenge
-      if (data.success == false) {
-        setError(true);
+      // if errorHandler contains error then show error
+
+      if (data.success === false) {
+        dispatch(signUpFailure(data));
         return;
       }
+      //console.log(data)
+
+
+      dispatch(signUpSuccess(data));
+
       navigate("/sign-in");
+
     } catch (error) {
-      setLoading(false);
-      setError(true);
+      dispatch(signUpFailure(error));
+      // console.log(error);
     }
     //reset the form data to empty on submit
   };
@@ -81,7 +95,9 @@ export default function SignUp() {
           <span className="text-blue-500">Sign In</span>
         </Link>
       </div>
-      <p className="text-red-700 mt-3">{error && "Something went wrong"}</p>
+      <p className="text-red-700 mt-3">{error ? error.error || "Something went wrong in SignUp" : ""}</p>
+
+
     </div>
   );
 }

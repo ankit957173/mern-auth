@@ -3,7 +3,9 @@ import { useSelector } from 'react-redux'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from '../firebase'
 import { useDispatch } from 'react-redux';
-import { signOut, updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserSuccess, deleteUserStart } from '../redux/user/userSlice';
+import { errorHandler } from '../../../api/utils/error';
+// import ProgressBar from 'react-bootstrap/ProgressBar';
+import { signOut, clearError, updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserSuccess, deleteUserStart } from '../redux/user/userSlice';
 
 export default function Profile() {
     const dispatch = useDispatch()
@@ -47,6 +49,7 @@ export default function Profile() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+
             dispatch(updateUserStart());
             const res = await fetch(`/api/user/update/${currentUser._id}`, {
                 method: "POST",
@@ -56,6 +59,7 @@ export default function Profile() {
                 body: JSON.stringify(formData),
             });
             const data = await res.json();
+            //console.log(data)
             if (data.success === false) {
                 dispatch(updateUserFailure(data));
                 return;
@@ -63,9 +67,11 @@ export default function Profile() {
             dispatch(updateUserSuccess(data));
             setUpdateSuccess(true);
 
+
+
         } catch (error) {
             dispatch(updateUserFailure(error));
-            // console.log(error);
+            //  console.log(error);
         }
     };
     const handleDelete = async () => {
@@ -115,21 +121,26 @@ export default function Profile() {
                     className='h-24 w-24 self-center 
                     cursor-pointer rounded-full object-cover mt-2'
                     onClick={() => fileRef.current.click()} />
-                <p className='text-sm self-center'>{imageError ? (
-                    <span className='text-red-700'>Error uploading image(file size
-                        must be less than 5 MB)</span>
-                ) : imagePercent > 0 && imagePercent < 100 ? (
-                    <span className='text-slate-700'>{`Uploading: ${imagePercent}%`}</span>
-                ) : imagePercent === 100 ? (
-                    <span className='text-green-700'>Image uploaded successfully!</span>
-                )
-                    : ('')}
+                <div className='text-sm self-center'>
+                    {imageError ? (
+                        <span className='text-red-700'>Error uploading image (file size must be less than 5 MB)</span>
+                    ) : imagePercent > 0 && imagePercent < 100 ? (
+                        <div className="rounded-lg dark:bg-gray-700 shadow-lg transition-all duration-500 ease-in-out">
+                            <div className="rounded-lg bg-blue-600 text-md font-medium text-blue-100 text-center p-2 shadow-inner transition-width duration-500 ease-in-out"
+                                style={{ width: `${imagePercent}%`, fontSize: "1.5rem" }}>
+                                {imagePercent}%
+                            </div>
+                        </div>
 
-                </p>
+                    ) : imagePercent === 100 ? (
+                        <span className='text-green-700 font-semibold text-lg '>Image uploaded successfully!</span>
+                    ) : ('')}
+                </div>
+
                 <input defaultValue={currentUser.username} type="text" id='username' placeholder='Username' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
                 <input defaultValue={currentUser.email} type="email" id='email' placeholder='Email' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
                 <input type="password" id='password' placeholder='Password' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
-                <button className='bg-slate-700 text-white p-3 rounded-lg
+                <button type='submit' className='bg-slate-700 text-white p-3 rounded-lg
                  uppercase hover:opacity-90 disabled:opacity-80'> {loading ? 'Loading...' : 'Update'}</button>
             </form>
             <div className="flex justify-between mt-3">
@@ -140,7 +151,7 @@ export default function Profile() {
             </div>
             <p className='text-green-700'>{loading && "Please Wait..."}</p>
             <p className='text-green-700'>{updateSuccess && "Profile updated successfully!"}</p>
-            <p className='text-red-700'>{error && "Something went wrong!"}</p>
+            <p className='text-red-700'>{error ? error.error || "Something went wrong in Profile" : ""}</p>
         </div>
     )
 }
