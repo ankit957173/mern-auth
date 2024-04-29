@@ -17,16 +17,16 @@ export default function App() {
       <Header />
       <Routes>
 
-        <Route path='/' element={<Home />} />
+        <Route path='/' element={<About />} />
         <Route element={<PrivateRoute />} >
-          <Route path='/about' element={<About />} />
+          <Route path='/home' element={<Home />} />
         </Route>
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
         <Route element={<PrivateRoute />} >
           <Route path='/profile' element={<Profile />} />
         </Route>
-        {/* <Route path='/*' element={<PageNotFound />} /> */}
+        <Route path='/*' element={<PageNotFound />} />
       </Routes>
 
     </BrowserRouter>

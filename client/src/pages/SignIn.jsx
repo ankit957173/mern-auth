@@ -14,6 +14,7 @@ export default function SignIn() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // loading = false;
     // Dispatch an action to clear the error when the component mounts or when the page is refreshed
     dispatch(clearError());
   }, [dispatch]);
@@ -41,7 +42,7 @@ export default function SignIn() {
         return;
       }
       dispatch(signInSuccess(data));
-      navigate("/");
+      navigate("/home");
       document.getElementById("email").value = "";
       document.getElementById("password").value = "";
     } catch (error) {

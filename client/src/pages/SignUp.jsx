@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signUpFailure, signUpStart, signUpSuccess, clearError } from "../redux/user/userSlice";
+import { signUpFailure, signUpStart, clearError, signUpSuccess } from "../redux/user/userSlice";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -31,18 +31,19 @@ export default function SignUp() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-
+      console.log(data)
       //jaisa ki hum fetch use kr rhe h to hum setError ko ese set krenge
       // if errorHandler contains error then show error
 
       if (data.success === false) {
+
         dispatch(signUpFailure(data));
         return;
       }
       //console.log(data)
 
-
       dispatch(signUpSuccess(data));
+
 
       navigate("/sign-in");
 
