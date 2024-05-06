@@ -12,6 +12,7 @@ const userSlice = createSlice({
 
         clearError: (state) => {
             state.error = false;
+            state.loading = false;
         },
         signUpStart: (state) => {
             state.loading = true;

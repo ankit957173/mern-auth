@@ -3,8 +3,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from 'path';
+const app = express();
+
 dotenv.config();
 mongoose.connect(process.env.MONGO).then(() => {
     console.log("connected to mongoDB");
@@ -12,8 +15,8 @@ mongoose.connect(process.env.MONGO).then(() => {
 }).catch((err) => {
     console.log(err);
 })
+// app.use(cors);
 const __dirname = path.resolve();
-const app = express();
 app.use(express.static(path.join(__dirname, '/client/dist')))
 
 app.get('*', (req, res) => {

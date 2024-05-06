@@ -1,11 +1,14 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signUpFailure, signUpStart, clearError, signUpSuccess } from "../redux/user/userSlice";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+
 
 import OAuth from "../components/OAuth";
 export default function SignUp() {
+  const passwordRef = useRef();
   const [formData, setFormData] = useState({});
   const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -17,6 +20,18 @@ export default function SignUp() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+  const showPassword = () => {
+    // passwordRef.current.type = "text"
+    if (passwordRef.current.type === "password") {
+      // ref.current.src = "icons/eye.png"
+      passwordRef.current.type = "text"
+    }
+    else {
+      passwordRef.current.type = "password"
+      // ref.current.src = "icons/eyecross.png"
+    }
+
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     //isme puri url se bhi kr skte the lekin ab half url vite.config.js me daal diye as a proxy
@@ -31,7 +46,7 @@ export default function SignUp() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log(data)
+      // console.log(data)
       //jaisa ki hum fetch use kr rhe h to hum setError ko ese set krenge
       // if errorHandler contains error then show error
 
@@ -73,13 +88,27 @@ export default function SignUp() {
           className="bg-slate-100 p-3 rounded-lg"
           onChange={handleChange}
         />
-        <input
-          type="password"
-          placeholder="Password"
-          id="password"
-          className="bg-slate-100 p-3 rounded-lg"
-          onChange={handleChange}
-        />
+        <div className="relative ">
+          <input
+            type="password"
+            placeholder="Password"
+            id="password"
+            className="bg-slate-100 p-3 rounded-lg w-full"
+            onChange={handleChange}
+            ref={passwordRef}
+          />
+          <span
+            className="absolute right-[3px] top-[4px] cursor-pointer mt-2"
+            onClick={showPassword}
+          >
+            <lord-icon
+              src="https://cdn.lordicon.com/fmjvulyw.json"
+              trigger="hover"
+              style={{ width: "25px", height: "25px" }}
+            ></lord-icon>
+          </span>
+        </div>
+
         <button
           disabled={loading}
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
