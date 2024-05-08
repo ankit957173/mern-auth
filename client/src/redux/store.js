@@ -19,7 +19,7 @@ export const store = configureStore({
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
-            serializableCheck: false // Disable serializable check only if necessary middleware
+            serializableCheck: false
         }),
 });
 //getDefaultmiddleware me {} lagaoge to return bhi lgana pdega

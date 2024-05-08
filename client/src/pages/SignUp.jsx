@@ -3,12 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { signUpFailure, signUpStart, clearError, signUpSuccess } from "../redux/user/userSlice";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
 import OAuth from "../components/OAuth";
 export default function SignUp() {
   const passwordRef = useRef();
+  const inputRef = useRef(null);
   const [formData, setFormData] = useState({});
   const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -17,18 +20,19 @@ export default function SignUp() {
     // Dispatch an action to clear the error when the component mounts or when the page is refreshed
     dispatch(clearError());
   }, [dispatch]);
+  useEffect(() => {
+    // Focus on the input field when the component mounts
+    inputRef.current.focus();
+  }, []);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
   const showPassword = () => {
-    // passwordRef.current.type = "text"
     if (passwordRef.current.type === "password") {
-      // ref.current.src = "icons/eye.png"
       passwordRef.current.type = "text"
     }
     else {
       passwordRef.current.type = "password"
-      // ref.current.src = "icons/eyecross.png"
     }
 
   }
@@ -69,12 +73,15 @@ export default function SignUp() {
     //reset the form data to empty on submit
   };
 
-  return (
+  return (<>
+    <ToastContainer />
+
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
+          ref={inputRef}
           type="text"
           placeholder="Username"
           id="username"
@@ -129,5 +136,6 @@ export default function SignUp() {
 
 
     </div>
+  </>
   );
 }

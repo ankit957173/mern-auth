@@ -28,16 +28,16 @@ export const signup = async (req, res, next) => {
 
     const { username, email, password } = req.body;
     if (!email && !password && !username) {
-        return next(errorHandler(400, "Please enter Username, email and password"));
+        return next(errorHandler(400, "Please enter Username, Email and Password"));
     }
     if (!email) {
-        return next(errorHandler(400, "Please enter email"));
+        return next(errorHandler(400, "Please enter Email"));
     }
     if (!password) {
-        return next(errorHandler(400, "Please enter password"));
+        return next(errorHandler(400, "Please enter Password"));
     }
     if (!username) {
-        return next(errorHandler(400, "Please enter username"));
+        return next(errorHandler(400, "Please enter Username"));
     }
     const passwordError = validatePassword(password);
     if (passwordError) {
@@ -77,13 +77,13 @@ export const signup = async (req, res, next) => {
 export const signin = async (req, res, next) => {
     const { email, password } = req.body;
     if (!email && !password) {
-        return next(errorHandler(400, "Please enter email and password"));
+        return next(errorHandler(400, "Please enter Email and password"));
     }
-    if (!email) return next(errorHandler(400, "Please enter email"));
-    if (!password) return next(errorHandler(400, "Please enter password"));
+    if (!email) return next(errorHandler(400, "Please enter Email"));
+    if (!password) return next(errorHandler(400, "Please enter Password"));
     try {
         const validUser = await User.findOne({ email });
-        if (!validUser) return next(errorHandler(404, "User not found"));
+        if (!validUser) return next(errorHandler(404, "User does not Exist Please Sign Up"));
         const isMatch = await bcryptjs.compare(password, validUser.password);
         if (!isMatch) return next(errorHandler(400, "Wrong Password"));
 
@@ -97,7 +97,7 @@ export const signin = async (req, res, next) => {
             .status(200)
             .json(others);
     } catch (error) {
-        next(errorHandler(500, "Error in signin"));
+        next(errorHandler(500, "Error in Signin"));
     }
 
 }

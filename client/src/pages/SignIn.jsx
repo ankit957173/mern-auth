@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 export default function SignIn() {
   const passwordRef = useRef();
+  const inputRef = useRef(null);
   const [formData, setFormData] = useState({});
   const { loading, error } = useSelector((state) => state.user);
 
@@ -19,6 +20,10 @@ export default function SignIn() {
     // Dispatch an action to clear the error when the component mounts or when the page is refreshed
     dispatch(clearError());
   }, [dispatch]);
+  useEffect(() => {
+    // Focus on the input field when the component mounts
+    inputRef.current.focus();
+  }, []);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -74,6 +79,7 @@ export default function SignIn() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
         <input
+          ref={inputRef}
           type="email"
           placeholder="Email"
           id="email"

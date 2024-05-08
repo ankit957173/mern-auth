@@ -1,4 +1,3 @@
-import { Timestamp } from "bson";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -20,10 +19,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "https://th.bing.com/th/id/OIP.lcdOc6CAIpbvYx3XHfoJ0gAAAA?rs=1&pid=ImgDetMain"
     },
-    // savedData: {
-    //     type: Array,
-    //     default: []
-    // },
+    savedData: {
+        type: Array,
+        default: []
+    }
 
 },
     //means each user has a timestamp and sort them 

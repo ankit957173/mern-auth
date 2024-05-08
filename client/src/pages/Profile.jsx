@@ -3,9 +3,7 @@ import { useSelector } from 'react-redux'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from '../firebase'
 import { useDispatch } from 'react-redux';
-import { errorHandler } from '../../../api/utils/error';
-// import ProgressBar from 'react-bootstrap/ProgressBar';
-import { signOut, clearError, updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserSuccess, deleteUserStart } from '../redux/user/userSlice';
+import { signOut, updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserSuccess, deleteUserStart } from '../redux/user/userSlice';
 
 export default function Profile() {
     const dispatch = useDispatch()
