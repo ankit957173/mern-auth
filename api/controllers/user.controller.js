@@ -10,7 +10,7 @@ const validatePassword = (password) => {
     if (!password || password.length < 5) return "Password must be at least 5 characters long.";
 
     // Check if password contains at least one special character
-    if (!/[!@#$%^&*()-_=+{}|<>?~]/.test(password)) return "Password must contain at least 1 special character.";
+    if (!/(?=.*[!@#\$%\^&\*])/.test(password)) return "Password must contain at least 1 special character.";
 
 
     // Check if password contains any spaces
