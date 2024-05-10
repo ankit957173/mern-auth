@@ -59,7 +59,7 @@ const Home = () => {
             setPasswordArray([...passwordArray, { ...form, id: uuidv4() }])
 
             setform({ site: "", username: "", password: "" })
-            toast('Password saved!', {
+            toast('Saved Successfully', {
                 position: "top-right",
                 autoClose: 4000,
                 hideProgressBar: false,
@@ -71,7 +71,7 @@ const Home = () => {
             });
         }
         else {
-            toast('Error: Password not saved!');
+            toast('Minimun 4 characters required');
         }
 
     }
