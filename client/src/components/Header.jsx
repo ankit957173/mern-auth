@@ -25,7 +25,7 @@ export default function Header() {
                         {currentUser ? (
                             <img src={currentUser.profilePicture} alt='profile' className='h-7 w-7 rounded-full object-cover' />
                         ) : (
-                            <li>Sign In</li>
+                            <li>Log In</li>
                         )}
                     </Link>
                 </ul>

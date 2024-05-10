@@ -79,7 +79,7 @@ export default function SignUp() {
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           ref={inputRef}
           type="text"
@@ -118,18 +118,19 @@ export default function SignUp() {
 
         <button
           disabled={loading}
-          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+          className="bg-slate-700 fontbo text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
         >
           {loading ? "Loading..." : "Sign Up"}
         </button>
+        <div className="relative text-center w-full font-semibold uppercase">or</div>
         <OAuth />
       </form>
-      <div className="flex gap-2 mt-5">
-        <p>Have an account?</p>
+      <div className="flex gap-2 mt-3">
+        <p>Existing User?</p>
         {/* link may be without { } also */}
         <Link to={"/sign-in"}>
 
-          <span className="text-blue-500">Sign In</span>
+          <span className="text-blue-500">Log In</span>
         </Link>
       </div>
       <p className="text-red-700 mt-3">{error ? error.error || "Something went wrong in SignUp" : ""}</p>

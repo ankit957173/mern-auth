@@ -5,12 +5,12 @@ import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
 const validatePassword = (password) => {
+    // ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,}$
     // Check if password length is at least 5 characters
     if (!password || password.length < 5) return "Password must be at least 5 characters long.";
 
     // Check if password contains at least one special character
-    if (!/[!@#$%^&*()-_=+{}|<>?~]/.test(password)) return "Password must contain at least 1 special character.";
-
+    if (!/(?=.*[!@#\$%\^&\*])/.test(password)) return "Password must contain at least 1 special character.";
 
     // Check if password contains any spaces
     if (/\s/.test(password)) return "Password must not contain spaces.";
@@ -144,4 +144,49 @@ export const google = async (req, res, next) => {
 export const signout = async (req, res, next) => {
     res.clearCookie("access_token");
     res.status(200).json("Signout Successful!");
+}
+
+export const findemail = async (req, res, next) => {
+    try {
+        // console.log(req.body)
+        const email = req.body.email;
+        if (!email) return next(errorHandler(400, "Please enter Email"));
+        const validUser = await User.findOne({ email });
+        if (validUser === null) {
+            return next(errorHandler(404, "User does not Exist Please Sign Up"));
+        }
+        else {
+            res.status(200).json(validUser);
+            // console.log("User found")
+            next(); // Pass control to the next middleware function
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+export const updatepassword = async (req, res, next) => {
+    try {
+        const { password } = req.body;
+        if (!password) return next(errorHandler(400, "Please enter password"))
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            return next(errorHandler(400, passwordError));
+        }
+
+        if (req.body.password) {
+            req.body.password = await bcryptjs.hash(req.body.password, 10);
+        }
+        // console.log(req.body.email, req.body.password)
+
+        await User.findOneAndUpdate({ email: req.body.email }, {
+            $set: {
+                password: req.body.password,
+            }
+        }, { new: true });
+        res.status(200).json({ message: "Password updated successfully" });
+        // console.log("password updated successfully")
+        next();
+    } catch (error) {
+        console.log("error in update password controller!!")
+    }
 }

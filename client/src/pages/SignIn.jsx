@@ -16,8 +16,7 @@ export default function SignIn() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // loading = false;
-    // Dispatch an action to clear the error when the component mounts or when the page is refreshed
+
     dispatch(clearError());
   }, [dispatch]);
   useEffect(() => {
@@ -74,9 +73,9 @@ export default function SignIn() {
 
   return (
     <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
+      <h1 className="text-3xl text-center font-semibold my-7">Log In</h1>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
 
         <input
           ref={inputRef}
@@ -106,20 +105,29 @@ export default function SignIn() {
             ></lord-icon>
           </span>
         </div>
+
+
+        {/* link may be without { } also */}
+        <Link to={"/forgot-password"}>
+
+          <span className="text-blue-500">Forgotten password?</span>
+        </Link>
         <button
           disabled={loading}
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
         >
-          {loading ? "Loading..." : "Sign In"}
+          {loading ? "Loading..." : "Log In"}
         </button>
+        <div className="relative text-center w-full font-semibold uppercase">or</div>
+
         <OAuth />
       </form>
       <div className="flex gap-2 mt-5">
-        <p>Dont Have an account?</p>
+        <p>New to TrustLink?</p>
         {/* link may be without { } also */}
         <Link to={"/sign-up"}>
 
-          <span className="text-blue-500">Sign Up</span>
+          <span className="text-blue-500">Create an account</span>
         </Link>
       </div>
       <p className="text-red-700 mt-3">{error ? error.error || "Something went wrong in signin" : ''}</p>

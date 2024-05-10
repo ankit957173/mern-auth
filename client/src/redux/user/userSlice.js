@@ -66,6 +66,17 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = false;
         },
+        forgotStart: (state) => {
+            state.loading = true;
+        },
+        forgotSucess: (state, action) => {
+            state.loading = false;
+            state.error = false;
+        },
+        forgotFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        }
 
     }
 });
@@ -78,6 +89,6 @@ export const {
     updateUserSuccess, updateUserFailure
     , deleteUserStart, deleteUserSuccess,
     deleteUserFailure,
-    signOut
+    signOut, forgotSucess, forgotFailure, forgotStart
 } = userSlice.actions;
 export default userSlice.reducer;
