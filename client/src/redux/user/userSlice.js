@@ -76,8 +76,7 @@ const userSlice = createSlice({
         forgotFailure: (state, action) => {
             state.loading = false;
             state.error = action.payload;
-        }
-
+        },
     }
 });
 

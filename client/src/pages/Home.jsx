@@ -1,80 +1,69 @@
 import React from 'react'
 import { useRef, useState, useEffect } from 'react';
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid';
 
+import { clearError } from '../redux/user/userSlice';
+import { ToastContainer } from 'react-toastify';
 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastNotify } from '../components/ToastNotify';
 
 const Home = () => {
     const passwordRef = useRef()
     const inputRef = useRef(null)
+    const dispatch = useDispatch()
     const [form, setform] = useState({ site: "", username: "", password: "" })
-    const { currentUser, loading, error } = useSelector((state) => state.user)
+    const { currentUser, error } = useSelector((state) => state.user)
+    let length = 0;
 
     const [passwordArray, setPasswordArray] = useState(currentUser?.savedData || []);
     const getPasswords = async () => {
         try {
-            const res = await fetch(`/api/user/getPasswords/${currentUser._id}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
 
-            if (res.ok) {
-                const data = await res.json();
-                setPasswordArray(data.savedData); // Update password array state with fetched data
-            } else {
-                // Handle error response
-                console.error("Error in fetching Response:", res.statusText);
-            }
+            const response = await fetch(`/api/user/getPasswords/${currentUser._id}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            }).then(res => res.json());
+
+
+            setPasswordArray(response);
         } catch (error) {
             console.error("Error in fetching data:", error);
-            // Handle error
         }
+
 
     };
 
+
     useEffect(() => {
+        if (error) {
+            ToastNotify(error.error);
+        } dispatch(clearError());
         getPasswords();
-    }, [currentUser.savedData]);
+    }, [error])
 
 
-    useEffect(() => {
-        inputRef.current.focus();
-    }, [passwordArray]);
-
-    const savePassword = async () => {
+    const savePassword = async (event) => {
+        // Yadi form submission hai, to prevent default behavior
+        event.preventDefault();
 
         if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
-            // phle api call krenge baad me setpasswordArray krenge kyoki agr phle set kr diya to component turant render ho jaayega or api 
-            //         call nhi ho paayegi isliye phle api call kro then setPasswordArray kr diya
+            const newId = uuidv4(); // Generate a new UUID and store it in a variable
             await fetch(`/api/user/pushPassword/${currentUser._id}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...form, id: uuidv4() })
+                body: JSON.stringify({ ...form, id: newId })
             })
-            setPasswordArray([...passwordArray, { ...form, id: uuidv4() }])
-
+            setPasswordArray([...passwordArray, { ...form, id: newId }])
             setform({ site: "", username: "", password: "" })
-            toast('Saved Successfully', {
-                position: "top-right",
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-            });
+            ToastNotify('Password Saved!');
+            getPasswords();
         }
         else {
-            toast('Minimun 4 characters required');
+            ToastNotify('Minimun 4 characters required');
         }
-
     }
+
 
     const deletePassword = async (id) => {
 
@@ -89,15 +78,7 @@ const Home = () => {
                 })
             setPasswordArray(passwordArray.filter(item => item.id !== id))
 
-            toast('Password Deleted!', {
-                position: "top-right",
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-            });
+            ToastNotify('Password Deleted!');
         }
 
     }
@@ -121,16 +102,7 @@ const Home = () => {
 
 
     const copyText = (text) => {
-        toast('Copied to clipboard!', {
-            position: "top-right",
-            autoClose: 4000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-        });
+        ToastNotify('Copied to clipboard!');
         navigator.clipboard.writeText(text)
     }
 
@@ -163,30 +135,36 @@ const Home = () => {
                 </h1>
                 <p className='text-green-900 text-lg text-center'>Your own Password Manager</p>
 
-                <div className="flex flex-col p-4 text-black gap-8 items-center">
-                    <input ref={inputRef} value={form.site} onChange={handleChange} placeholder='Enter website URL' className='rounded-full border border-green-500 w-full p-4 py-1' type="text" name="site" id="site" />
-                    <div className="flex flex-col md:flex-row w-full justify-between gap-8">
-                        <input value={form.username} onChange={handleChange} placeholder='Enter Username' className='rounded-full border border-green-500 w-full p-4 py-1' type="text" name="username" id="username" />
-                        <div className="relative" >
-                            <input ref={passwordRef} value={form.password} onChange={handleChange} placeholder='Enter Password' className='rounded-full border border-green-500 w-full p-4 py-1' type="password" name="password" id="password" />
-                            <span className='absolute right-[3px] top-[4px] cursor-pointer' onClick={showPassword}>
-
-                                <lord-icon
-                                    src="https://cdn.lordicon.com/fmjvulyw.json"
-                                    trigger="hover"
-                                    style={{ "width": "25px", "height": "25px" }}>
-                                </lord-icon>
-                            </span>
+                <form onSubmit={savePassword}>
+                    <div className="flex flex-col p-4 text-black gap-8 items-center">
+                        <input ref={inputRef} value={form.site} onChange={handleChange} placeholder='Enter website URL' className='rounded-full border border-green-500 w-full p-4 py-1' type="text" name="site" id="site" />
+                        <div className="flex flex-col md:flex-row w-full justify-between gap-8">
+                            <input value={form.username} onChange={handleChange} placeholder='Enter Username' className='rounded-full border border-green-500 w-full p-4 py-1' type="text" name="username" id="username" />
+                            <div className="relative">
+                                <input ref={passwordRef} value={form.password} onChange={handleChange} placeholder='Enter Password' className='rounded-full border border-green-500 w-full p-4 py-1' type="password" name="password" id="password" />
+                                <span className='absolute right-[3px] top-[4px] cursor-pointer' onClick={showPassword}>
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/fmjvulyw.json"
+                                        trigger="hover"
+                                        style={{ "width": "25px", "height": "25px" }}>
+                                    </lord-icon>
+                                </span>
+                            </div>
                         </div>
-
                     </div>
-                    <button onClick={savePassword} className='flex justify-center items-center gap-2 bg-green-400 hover:bg-green-300 rounded-full px-8 py-2 w-fit border border-green-900'>
-                        <lord-icon
-                            src="https://cdn.lordicon.com/jgnvfzqg.json"
-                            trigger="hover" >
-                        </lord-icon>
-                        Save</button>
-                </div>
+                    <div className="flex justify-center">
+                        <button type='submit' className='flex justify-center items-center gap-2 bg-green-400 hover:bg-green-300 rounded-full px-8 py-2 w-fit border border-green-900'>
+                            <lord-icon
+                                src="https://cdn.lordicon.com/jgnvfzqg.json"
+                                trigger="hover" >
+                            </lord-icon>
+                            Save
+                        </button>
+                    </div>
+                </form>
+
+
+
 
                 <div className="passwords">
                     <h2 className='font-bold text-2xl py-4'>Your Passwords</h2>

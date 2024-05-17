@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { signInStart, signInSuccess, signInFailure, clearError } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import OAuth from "../components/OAuth";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import { ToastNotify } from "../components/ToastNotify";
 export default function SignIn() {
   const passwordRef = useRef();
   const inputRef = useRef(null);
@@ -20,21 +20,28 @@ export default function SignIn() {
     dispatch(clearError());
   }, [dispatch]);
   useEffect(() => {
-    // Focus on the input field when the component mounts
+
     inputRef.current.focus();
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      ToastNotify(error.error)
+    }
+    dispatch(clearError());
+  }, [error]);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
   const showPassword = () => {
-    // passwordRef.current.type = "text"
+
     if (passwordRef.current.type === "password") {
-      // ref.current.src = "icons/eye.png"
+
       passwordRef.current.type = "text"
     }
     else {
       passwordRef.current.type = "password"
-      // ref.current.src = "icons/eyecross.png"
+
     }
 
   }
@@ -58,8 +65,12 @@ export default function SignIn() {
         dispatch(signInFailure(data));
         return;
       }
-      dispatch(signInSuccess(data));
-      navigate("/home");
+
+      ToastNotify('Welcome Back!!')
+      setTimeout(() => {
+        dispatch(signInSuccess(data));
+        navigate("/home");
+      }, 2000);
       document.getElementById("email").value = "";
       document.getElementById("password").value = "";
     } catch (error) {
@@ -71,7 +82,7 @@ export default function SignIn() {
 
   };
 
-  return (
+  return (<> <ToastContainer />
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Log In</h1>
 
@@ -130,11 +141,11 @@ export default function SignIn() {
           <span className="text-blue-500">Create an account</span>
         </Link>
       </div>
-      <p className="text-red-700 mt-3">{error ? error.error || "Something went wrong in signin" : ''}</p>
-      {/* toast the error and show the error in toast */}
+
 
 
 
     </div>
+  </>
   );
 }

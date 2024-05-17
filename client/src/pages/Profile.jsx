@@ -3,10 +3,13 @@ import { useSelector } from 'react-redux'
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from '../firebase'
 import { useDispatch } from 'react-redux';
-import { signOut, updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserSuccess, deleteUserStart } from '../redux/user/userSlice';
+import { ToastNotify } from '../components/ToastNotify';
+import { signOut, updateUserStart, updateUserSuccess, clearError, updateUserFailure, deleteUserFailure, deleteUserSuccess, deleteUserStart } from '../redux/user/userSlice';
+import { ToastContainer } from 'react-toastify';
 
 export default function Profile() {
     const dispatch = useDispatch()
+    const passwordRef = useRef();
     const fileRef = useRef(null);
     const { currentUser, loading, error } = useSelector((state) => state.user);
 
@@ -18,6 +21,20 @@ export default function Profile() {
     useEffect(() => {
         if (image) { handleFileUpload(image); }
     }, [image]);
+
+    useEffect(() => {
+        if (error) {
+            ToastNotify(error.error);
+        } dispatch(clearError());
+    }, [error])
+    useEffect(() => {
+
+        setFormData({
+            username: currentUser.username,
+            email: currentUser.email,
+            profilePicture: currentUser.profilePicture,
+        });
+    }, []);
     const handleFileUpload = async (image) => {
         const storage = getStorage(app);
         const fileName = new Date().getTime() + image.name;
@@ -44,6 +61,15 @@ export default function Profile() {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
     };
+    const showPassword = () => {
+        if (passwordRef.current.type === "password") {
+            passwordRef.current.type = "text"
+        }
+        else {
+            passwordRef.current.type = "password"
+        }
+
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -64,7 +90,7 @@ export default function Profile() {
             }
             dispatch(updateUserSuccess(data));
             setUpdateSuccess(true);
-
+            ToastNotify('Profile Updated')
 
 
         } catch (error) {
@@ -74,16 +100,21 @@ export default function Profile() {
     };
     const handleDelete = async () => {
         try {
-            dispatch(deleteUserStart());
-            const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-                method: "DELETE",
-            });
-            const data = await res.json();
-            if (data.success === false) {
-                dispatch(deleteUserFailure(data));
-                return;
+            const c = confirm("Do you really want to delete your account?")
+            if (c) {
+                dispatch(deleteUserStart());
+                const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+                    method: "DELETE",
+                });
+                const data = await res.json();
+                if (data.success === false) {
+                    dispatch(deleteUserFailure(data));
+                    return;
+                }
+                dispatch(deleteUserSuccess(data));
+                ToastNotify('Account Deleted')
+
             }
-            dispatch(deleteUserSuccess(data));
             // deleteUserStart(true);
         } catch (error) {
             dispatch(deleteUserFailure(error));
@@ -97,10 +128,9 @@ export default function Profile() {
         } catch (error) {
             console.log(error)
         }
-        // localStorage.clear()
-        // window.location.reload()
+
     }
-    return (
+    return (<><ToastContainer />
         <div className='p-3 max-w-lg mx-auto'>
             <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
             <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
@@ -135,21 +165,40 @@ export default function Profile() {
                     ) : ('')}
                 </div>
 
-                <input defaultValue={currentUser.username} type="text" id='username' placeholder='Username' className='bg-slate-100 rounded-lg p-3' required onChange={handleChange} />
-                <input defaultValue={currentUser.email} type="email" id='email' placeholder='Email' className='bg-slate-100 rounded-lg p-3' required onChange={handleChange} />
-                <input type="password" id='password' placeholder='Password' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
+                <input defaultValue={currentUser.username} type="text" id='username' placeholder='Username' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
+                <input defaultValue={currentUser.email} type="email" id='email' placeholder='Email' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
+                <div className="relative ">
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        id="password"
+                        className="bg-slate-100 p-3 rounded-lg w-full"
+                        onChange={handleChange}
+                        ref={passwordRef}
+                    />
+                    <span
+                        className="absolute right-[3px] top-[4px] cursor-pointer mt-2"
+                        onClick={showPassword}
+                    >
+                        <lord-icon
+                            src="https://cdn.lordicon.com/fmjvulyw.json"
+                            trigger="hover"
+                            style={{ width: "25px", height: "25px" }}
+                        ></lord-icon>
+                    </span>
+                </div>
                 <button type='submit' className='bg-slate-700 text-white p-3 rounded-lg
                  uppercase hover:opacity-90 disabled:opacity-80'> {loading ? 'Loading...' : 'Update'}</button>
             </form>
             <div className="flex justify-between mt-3">
                 <span className="bg-transparent hover:bg-red-500 text-white-700 font-semibold hover:text-white py-2 px-4 border border-black-500 hover:border-transparent cursor-pointer rounded"
-                    onClick={handleDelete}>Delete Account</span>
+                    onClick={handleDelete} >Delete Account</span>
                 <span className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded cursor-pointer"
-                    onClick={handleSignout}>Sign out</span>
+                    onClick={handleSignout}>Log out</span>
             </div>
-            <p className='text-green-700'>{loading && "Please Wait..."}</p>
-            <p className='text-green-700'>{updateSuccess && "Profile updated successfully!"}</p>
-            <p className='text-red-700'>{error ? error.error || "Something went wrong in Profile" : ""}</p>
+
+
         </div>
+    </>
     )
 }

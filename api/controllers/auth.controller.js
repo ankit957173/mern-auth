@@ -3,60 +3,46 @@ import User from "../models/User.model.js";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
-
-const validatePassword = (password) => {
-    // ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,}$
-    // Check if password length is at least 5 characters
-    if (!password || password.length < 5) return "Password must be at least 5 characters long.";
-
-    // Check if password contains at least one special character
-    if (!/(?=.*[!@#\$%\^&\*])/.test(password)) return "Password must contain at least 1 special character.";
-
-    // Check if password contains any spaces
-    if (/\s/.test(password)) return "Password must not contain spaces.";
-
-    return null; // Password is valid
-};
-
-const validateUsername = (username) => {
-    // Check if username contains any spaces
-    if (/\s/.test(username)) return "Username must not contain spaces.";
-
-    return null; // Username is valid
-};
+import { validateEmail, validatePassword, validateUsername } from "../utils/validate.js";
 export const signup = async (req, res, next) => {
 
     const { username, email, password } = req.body;
     if (!email && !password && !username) {
         return next(errorHandler(400, "Please enter Username, Email and Password"));
     }
-    if (!email) {
-        return next(errorHandler(400, "Please enter Email"));
-    }
-    if (!password) {
-        return next(errorHandler(400, "Please enter Password"));
-    }
     if (!username) {
         return next(errorHandler(400, "Please enter Username"));
-    }
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-        return next(errorHandler(400, passwordError));
     }
     const usernameError = validateUsername(username);
     if (usernameError) {
         return next(errorHandler(400, usernameError));
     }
-    // Check if username already exists
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
         return next(errorHandler(400, "Username already exists"));
     }
+    if (!email) {
+        return next(errorHandler(400, "Please enter Email"));
+    }
 
-    // Check if email already exists
+    const emailError = validateEmail(email);
+    if (emailError) {
+        return next(errorHandler(400, emailError));
+    }
+
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
         return next(errorHandler(400, "Email already exists"));
+    }
+    if (!password) {
+        return next(errorHandler(400, "Please enter Password"));
+    }
+
+
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+        return next(errorHandler(400, passwordError));
     }
     const hashedPassword = await bcryptjs.hash(password, 10);
     const newUser = new User({ username, email, password: hashedPassword });
@@ -80,7 +66,11 @@ export const signin = async (req, res, next) => {
         return next(errorHandler(400, "Please enter Email and password"));
     }
     if (!email) return next(errorHandler(400, "Please enter Email"));
+    const validEmail = validateEmail(email);
+    if (validEmail) return next(errorHandler(400, validEmail));
     if (!password) return next(errorHandler(400, "Please enter Password"));
+    const passwordError = validatePassword(password);
+    if (passwordError) return next(errorHandler(400, passwordError));
     try {
         const validUser = await User.findOne({ email });
         if (!validUser) return next(errorHandler(404, "User does not Exist Please Sign Up"));

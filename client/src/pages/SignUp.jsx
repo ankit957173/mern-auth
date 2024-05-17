@@ -1,12 +1,10 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signUpFailure, signUpStart, clearError, signUpSuccess } from "../redux/user/userSlice";
+import { signUpFailure, signUpStart, clearError, signUpSuccess, signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-
+import { ToastContainer } from 'react-toastify';
+import { ToastNotify } from "../components/ToastNotify.js"
 
 import OAuth from "../components/OAuth";
 export default function SignUp() {
@@ -24,6 +22,13 @@ export default function SignUp() {
     // Focus on the input field when the component mounts
     inputRef.current.focus();
   }, []);
+  useEffect(() => {
+    if (error) {
+      ToastNotify(error.error)
+    }
+    dispatch(clearError());
+  }, [error]);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -59,12 +64,39 @@ export default function SignUp() {
         dispatch(signUpFailure(data));
         return;
       }
-      //console.log(data)
+      try {
+        dispatch(signInStart());
+        const res = await fetch("/api/auth/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        const data = await res.json();
+
+        //jaisa ki hum fetch use kr rhe h to hum setError ko ese set krenge
+        if (data.success === false) {
+          dispatch(signInFailure(data));
+          return;
+        }
+
+        ToastNotify('Welcome To TrustLink!!')
+        setTimeout(() => {
+          dispatch(signInSuccess(data));
+          navigate("/home");
+        }, 2000);
+        document.getElementById("username").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+      } catch (error) {
+        dispatch(signInFailure(error));
+      }
+
 
       dispatch(signUpSuccess(data));
 
 
-      navigate("/sign-in");
 
     } catch (error) {
       dispatch(signUpFailure(error));
@@ -80,6 +112,8 @@ export default function SignUp() {
       <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+
+
         <input
           ref={inputRef}
           type="text"
@@ -133,7 +167,6 @@ export default function SignUp() {
           <span className="text-blue-500">Log In</span>
         </Link>
       </div>
-      <p className="text-red-700 mt-3">{error ? error.error || "Something went wrong in SignUp" : ""}</p>
 
 
     </div>

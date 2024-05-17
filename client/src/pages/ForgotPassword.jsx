@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import { ToastNotify } from '../components/ToastNotify'
 import { forgotFailure, forgotSucess, forgotStart, clearError } from '../redux/user/userSlice'
 
 
@@ -26,6 +26,12 @@ const ForgotPassword = () => {
 
     dispatch(clearError());
   }, [dispatch]);
+  useEffect(() => {
+
+    if (error) {
+      ToastNotify(error.error)
+    }
+  })
   const handleChangeConfirmPassword = (e) => {
     setConfirmPassword(e.target.value);
   };
@@ -71,17 +77,7 @@ const ForgotPassword = () => {
       }
       dispatch(forgotSucess());
       setFound(true);
-      toast('Enter New Password', {
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-
+      ToastNotify('Enter New Password')
     }
     catch (error) {
 
@@ -112,16 +108,8 @@ const ForgotPassword = () => {
       }
       dispatch(forgotSucess());
 
-      toast('Password Updated Successfully', {
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+
+      ToastNotify('Password Updated Successfully')
 
       setTimeout(() => {
         navigate('/sign-in');

@@ -1,37 +1,35 @@
 import { errorHandler } from "../utils/error.js";
 import bcryptjs from "bcryptjs";
 import User from "../models/User.model.js";
+import { validateEmail, validatePassword, validateUsername } from "../utils/validate.js";
 
 export const test = (req, res) => {
     res.json({ message: "Api is working!" });
+    console.log("/  is working");
 }
-const validatePassword = (password) => {
-    // Check if password length is at least 5 characters
-    if (!password || password.length < 5) return "Password must be at least 5 characters long.";
-
-    // Check if password contains at least one special character
-    if (!/(?=.*[!@#\$%\^&\*])/.test(password)) return "Password must contain at least 1 special character.";
-
-
-    // Check if password contains any spaces
-    if (/\s/.test(password)) return "Password must not contain spaces.";
-
-    return null; // Password is valid
-};
-
 export const updateUser = async (req, res, next) => {
+    const validUsername = validateUsername(req.body.username);
+    if (validUsername) return next(errorHandler(400, validUsername));
+    const existingUsername = await User.findOne({ username: req.body.username });
+    if (existingUsername && existingUsername._id.toString() !== req.params.id) {
+        return next(errorHandler(400, "Username already exists."));
+    }
+
+    const validEmail = validateEmail(req.body.email);
+    if (validEmail) return next(errorHandler(400, validEmail));
+    const existingEmail = await User.findOne({ email: req.body.email });
+    if (existingEmail && existingEmail._id.toString() !== req.params.id) {
+        return next(errorHandler(400, "Email already exists."));
+    }
+    if (req.user.id !== req.params.id) {
+        return next(errorHandler(403, "You can update only your account!"));
+    }
+
     const passwordError = validatePassword(req.body.password);
     if (passwordError) {
         return next(errorHandler(400, passwordError));
     }
-    const existingUsername = await User.findOne({ username: req.body.username });
-    if (existingUsername) {
-        return next(errorHandler(400, "Username already exists."));
-    }
 
-    if (req.user.id !== req.params.id) {
-        return next(errorHandler(403, "You can update only your account!"));
-    }
     try {
         if (req.body.password) {
             req.body.password = await bcryptjs.hash(req.body.password, 10);
@@ -66,7 +64,9 @@ export const deleteUser = async (req, res, next) => {
 }
 
 export const getPasswords = async (req, res, next) => {
+
     try {
+
         const user = await User.findById(req.params.id);
 
         if (user) {
