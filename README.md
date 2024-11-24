@@ -10,7 +10,7 @@ This application is intended as a starting point for building full-stack web app
 
 ## Live Demo
 
-The application is deployed at https://mern-auth-axuo.onrender.com/ and https://authapp111.uc.r.appspot.com/ 
+The application is deployed at https://mern-auth-axuo.onrender.com/ 
 ## Environment Variables
 
 The application uses the following environment variables:
@@ -18,6 +18,7 @@ The application uses the following environment variables:
 - `JWT_SECRET`: Your JWT secret key
 - `MONGO`: Your MongoDB Atlas URL
 - `VITE_API_SECRET_KEY`: Your API secret key
+If anyone requests these environment variable I will be Sending it Unconditionally.
 
 ## Features
 
