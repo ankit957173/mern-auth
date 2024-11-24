@@ -27,7 +27,7 @@ app.use(cookieParser())
 // app.use(cors);
 
 app.listen(3000, () => {
-    console.log("listening on port 3000!");
+    console.log("Backend/Server is listening on port 3000!");
 })
 //paths
 app.use("/api/user", userRoutes);

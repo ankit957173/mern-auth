@@ -6,8 +6,11 @@ import { useDispatch } from 'react-redux';
 import { ToastNotify } from '../components/ToastNotify';
 import { signOut, updateUserStart, updateUserSuccess, clearError, updateUserFailure, deleteUserFailure, deleteUserSuccess, deleteUserStart } from '../redux/user/userSlice';
 import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
+    const navigate = useNavigate();
+
     const dispatch = useDispatch()
     const passwordRef = useRef();
     const fileRef = useRef(null);
@@ -91,6 +94,11 @@ export default function Profile() {
             dispatch(updateUserSuccess(data));
             setUpdateSuccess(true);
             ToastNotify('Profile Updated')
+            setTimeout(() => {
+                navigate("/home");
+            }, 3000);
+
+
 
 
         } catch (error) {
@@ -169,6 +177,7 @@ export default function Profile() {
                 <input defaultValue={currentUser.email} type="email" id='email' placeholder='Email' className='bg-slate-100 rounded-lg p-3' onChange={handleChange} />
                 <div className="relative ">
                     <input
+
                         type="password"
                         placeholder="Password"
                         id="password"

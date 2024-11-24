@@ -130,7 +130,7 @@ const Home = () => {
                 <h1 className='text-4xl text font-bold text-center'>
                     <span className='text-green-500'> &lt;</span>
 
-                    <span>Trust</span><span className='text-green-500'>blaze/&gt;</span>
+                    <span>Trust</span><span className='text-green-500'>Link/&gt;</span>
 
                 </h1>
                 <p className='text-green-900 text-lg text-center'>Your own Password Manager</p>

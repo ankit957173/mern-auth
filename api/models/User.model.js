@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema({
     savedData: {
         type: Array,
         default: []
+    }, verificationCode: {
+        type: String
     }
 
 },

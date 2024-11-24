@@ -4,6 +4,8 @@ import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 import { validateEmail, validatePassword, validateUsername } from "../utils/validate.js";
+import { generateVerificationCode, sendVerificationEmail } from "../utils/emailOtp.js";
+
 export const signup = async (req, res, next) => {
 
     const { username, email, password } = req.body;
@@ -138,18 +140,23 @@ export const signout = async (req, res, next) => {
 
 export const findemail = async (req, res, next) => {
     try {
-        // console.log(req.body)
         const email = req.body.email;
-        if (!email) return next(errorHandler(400, "Please enter Email"));
+        const validEmail = validateEmail(email);
+        if (validEmail) return next(errorHandler(400, validEmail));
         const validUser = await User.findOne({ email });
         if (validUser === null) {
             return next(errorHandler(404, "User does not Exist Please Sign Up"));
         }
-        else {
-            res.status(200).json(validUser);
-            // console.log("User found")
-            next(); // Pass control to the next middleware function
-        }
+
+        const verificationCode = generateVerificationCode();
+        await sendVerificationEmail(email, verificationCode);
+        validUser.verificationCode = verificationCode;
+        await validUser.save();
+
+        res.status(200).json({ message: "Verification code sent successfully", user: validUser });
+        // console.log("User found")
+        next(); // Pass control to the next middleware function
+
     } catch (error) {
         console.log(error)
     }
