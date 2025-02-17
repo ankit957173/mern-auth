@@ -19,7 +19,7 @@ export const updateUser = async (req, res, next) => {
     if (validEmail) return next(errorHandler(400, validEmail));
     const existingEmail = await User.findOne({ email: req.body.email });
     if (existingEmail && existingEmail._id.toString() !== req.params.id) {
-        return next(errorHandler(400, "Email already exists."));
+        return next(errorHandler(400, "Email already exists. Please choose a different email."));
     }
     if (req.user.id !== req.params.id) {
         return next(errorHandler(403, "You can update only your account!"));
@@ -51,17 +51,24 @@ export const updateUser = async (req, res, next) => {
     }
 }
 
+
 export const deleteUser = async (req, res, next) => {
-    if (req.user.id !== req.params.id) {
-        return next(errorHandler(403, "You can delete only your account!"));
-    }
     try {
-        await User.findByIdAndDelete(req.params.id);
+        console.log('Authenticated User ID:', req.user.id); // Log the authenticated user's ID
+        console.log('Request Params ID:', req.params.id); // Log the ID from the request parameters
+
+        // Check if the user is trying to delete their own account
+        if (req.user.id !== req.params.id) {
+            console.log('Mismatch IDs - Authenticated user can only delete their own account.');
+            return next(errorHandler(403, "You can delete only your account!"));
+        }
+
+        await User.findByIdAndDelete(req.params.id); // Proceed to delete the user account
         res.status(200).json("User has been deleted successfully!");
     } catch (error) {
-        next(error);
+        next(error); // Handle any errors
     }
-}
+};
 
 export const getPasswords = async (req, res, next) => {
 
@@ -73,7 +80,7 @@ export const getPasswords = async (req, res, next) => {
             const savedData = user.savedData; // Extract the savedData array from the user document
             return res.status(200).json(savedData); // Return the savedData array directly
         } else {
-            return res.status(404).json({ message: "User does not Exist Please Sign Up" }); // Corrected typo
+            return res.status(404).json({ message: "User does not Exist Please Create an Account" }); // Corrected typo
         }
     } catch (error) {
         next(error);
@@ -98,7 +105,7 @@ export const pushPassword = async (req, res, next) => {
             await user.save(); // Save the updated user document
             res.status(200).json({ message: "Password saved successfully" });
         } else {
-            res.status(404).json({ message: "User does not Exist Please Sign Up" });
+            res.status(404).json({ message: "User does not Exist Please Create an Account" });
         }
     } catch (error) {
         next(error); // Pass any errors to the error handling middleware
@@ -120,7 +127,7 @@ export const deleteParticularPassword = async (req, res, next) => {
 
             res.status(200).json({ message: "Password deleted successfully" });
         } else {
-            res.status(404).json({ message: "User does not Exist Please Sign Up" });
+            res.status(404).json({ message: "User does not Exist Please Create an Account" });
         }
     } catch (error) {
         next(error); // Pass any errors to the error handling middleware

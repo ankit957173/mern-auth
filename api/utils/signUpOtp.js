@@ -1,22 +1,22 @@
 import nodemailer from 'nodemailer';
 
-export const sendVerificationEmail = async (email, code) => {
-    const transporter = nodemailer.createTransport({
-        service: 'Gmail', // You can use other email services
-        auth: {
-            user: 'ankitsingh957173@gmail.com',
-            pass: 'dqsd cdbq jtlw mwim',
-        },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
+export const sendOtp = async (email, code) => {
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail', // You can use other email services
+    auth: {
+      user: 'ankitsingh957173@gmail.com',
+      pass: 'dqsd cdbq jtlw mwim',
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
 
-    const mailOptions = {
-        from: '"TrustLink" ankitsingh957173@gmail.com',
-        to: email,
-        subject: 'Verification Code',
-        html: `<!DOCTYPE html>
+  const mailOptions = {
+    from: '"TrustLink" ankitsingh957173@gmail.com',
+    to: email,
+    subject: 'Welcome to TrustLink',
+    html: `<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -56,11 +56,11 @@ export const sendVerificationEmail = async (email, code) => {
 <body>
   <div class="container">
     <div class="header">
-      <h1>Your Verification Code</h1>
+      <h1>We received a Sign Up request</h1>
     </div>
     <div class="content">
       <p>Dear User,</p>
-      <p>Thank you for using our service. Your verification code is:</p>
+      <p>Thank you for using our service. Your verification code for Sign Up is: </p>
       <h2>${code}</h2>
       <p>Please enter this code on the verification page to proceed.</p>
       <p>Thank you,<br>The TrustLink Team</p>
@@ -69,17 +69,13 @@ export const sendVerificationEmail = async (email, code) => {
 </body>
 </html>
 `,
-    };
+  };
 
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
-    } catch (error) {
-        console.error('Error sending email:', error);
-    }
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
 };
 
-
-export const generateVerificationCode = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit code
-};

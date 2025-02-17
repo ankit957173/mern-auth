@@ -15,16 +15,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    signUpOtp: {
+        type: String
+    },
     profilePicture: {
         type: String,
-        default: "https://th.bing.com/th/id/OIP.lcdOc6CAIpbvYx3XHfoJ0gAAAA?rs=1&pid=ImgDetMain"
+        default: "https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png"
     },
     savedData: {
         type: Array,
         default: []
     }, verificationCode: {
         type: String
-    }
+    }, verified: { type: Boolean, default: false }
 
 },
     //means each user has a timestamp and sort them 

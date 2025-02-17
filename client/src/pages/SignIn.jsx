@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import OAuth from "../components/OAuth";
 import { ToastContainer } from 'react-toastify';
 import { ToastNotify } from "../components/ToastNotify";
+
 export default function SignIn() {
   const passwordRef = useRef();
   const inputRef = useRef(null);
@@ -16,39 +17,34 @@ export default function SignIn() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-
     dispatch(clearError());
   }, [dispatch]);
-  useEffect(() => {
 
+  useEffect(() => {
     inputRef.current.focus();
   }, []);
 
   useEffect(() => {
     if (error) {
-      ToastNotify(error.error)
+      ToastNotify(error.error);
     }
     dispatch(clearError());
-  }, [error]);
+  }, [error, dispatch]);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
   const showPassword = () => {
-
     if (passwordRef.current.type === "password") {
-
-      passwordRef.current.type = "text"
+      passwordRef.current.type = "text";
+    } else {
+      passwordRef.current.type = "password";
     }
-    else {
-      passwordRef.current.type = "password"
+  };
 
-    }
-
-  }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //isme puri url se bhi kr skte the lekin ab half url vite.config.js me daal diye as a proxy
-
     try {
       dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
@@ -59,93 +55,78 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-
-      //jaisa ki hum fetch use kr rhe h to hum setError ko ese set krenge
       if (data.success === false) {
         dispatch(signInFailure(data));
+        ToastNotify(data.message);
         return;
       }
-
-      ToastNotify('Welcome Back!!')
-      setTimeout(() => {
-        dispatch(signInSuccess(data));
-        navigate("/home");
-      }, 2000);
+      document.cookie = `access_token=${data.token}; path=/;`;
+      ToastNotify('Welcome Back!!');
+      dispatch(signInSuccess(data));
+      navigate("/home");
       document.getElementById("email").value = "";
       document.getElementById("password").value = "";
     } catch (error) {
+      console.log("inside catch")
+      console.log("error during sign-in:", error);
       dispatch(signInFailure(error));
+      ToastNotify('Internal Server Error. Please try again.');
     }
-
-    //reset the form data to empty on submit
-    // reset the error to false
-
   };
 
-  return (<> <ToastContainer />
-    <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">Log In</h1>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-
-        <input
-          ref={inputRef}
-          type="email"
-          placeholder="Email"
-          id="email"
-          className="bg-slate-100 p-3 rounded-lg"
-          onChange={handleChange}
-        />
-        <div className="relative ">
+  return (
+    <>
+      <ToastContainer />
+      <div className="p-3 max-w-lg mx-auto">
+        <h1 className="text-3xl text-center font-semibold my-7">Log In</h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
-            type="password"
-            placeholder="Password"
-            id="password"
-            className="bg-slate-100 p-3 rounded-lg w-full"
+            ref={inputRef}
+            type="email"
+            placeholder="Email"
+            id="email"
+            className="bg-slate-100 p-3 rounded-lg"
             onChange={handleChange}
-            ref={passwordRef}
           />
-          <span
-            className="absolute right-[3px] top-[4px] cursor-pointer mt-2"
-            onClick={showPassword}
+          <div className="relative">
+            <input
+              type="password"
+              placeholder="Password"
+              id="password"
+              className="bg-slate-100 p-3 rounded-lg w-full"
+              onChange={handleChange}
+              ref={passwordRef}
+            />
+            <span
+              className="absolute right-[3px] top-[4px] cursor-pointer mt-2"
+              onClick={showPassword}
+            >
+              <lord-icon
+                src="https://cdn.lordicon.com/fmjvulyw.json"
+                trigger="hover"
+                style={{ width: "25px", height: "25px" }}
+              ></lord-icon>
+            </span>
+          </div>
+          <Link to={"/forgot-password"}>
+            <span className="text-blue-500">Forgotten password?</span>
+          </Link>
+          <button
+            disabled={loading}
+            className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
-            <lord-icon
-              src="https://cdn.lordicon.com/fmjvulyw.json"
-              trigger="hover"
-              style={{ width: "25px", height: "25px" }}
-            ></lord-icon>
-          </span>
+            {loading ? "Loading..." : "Log In"}
+          </button>
+          <div className="relative text-center w-full font-semibold uppercase">or</div>
+          <OAuth />
+        </form>
+        <div className="flex gap-2 mt-5">
+          <p>New to TrustLink?</p>
+          <Link to={"/sign-up"}>
+            <span className="text-blue-500">Create an account</span>
+          </Link>
         </div>
-
-
-        {/* link may be without { } also */}
-        <Link to={"/forgot-password"}>
-
-          <span className="text-blue-500">Forgotten password?</span>
-        </Link>
-        <button
-          disabled={loading}
-          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
-        >
-          {loading ? "Loading..." : "Log In"}
-        </button>
-        <div className="relative text-center w-full font-semibold uppercase">or</div>
-
-        <OAuth />
-      </form>
-      <div className="flex gap-2 mt-5">
-        <p>New to TrustLink?</p>
-        {/* link may be without { } also */}
-        <Link to={"/sign-up"}>
-
-          <span className="text-blue-500">Create an account</span>
-        </Link>
       </div>
-
-
-
-
-    </div>
-  </>
+    </>
   );
 }

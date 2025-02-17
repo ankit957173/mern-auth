@@ -9,42 +9,35 @@ import { ToastContainer } from 'react-toastify';
 import { ToastNotify } from '../components/ToastNotify';
 
 const Home = () => {
-    const passwordRef = useRef()
-    const inputRef = useRef(null)
-    const dispatch = useDispatch()
-    const [form, setform] = useState({ site: "", username: "", password: "" })
-    const { currentUser, error } = useSelector((state) => state.user)
-    let length = 0;
-
+    const passwordRef = useRef();
+    const inputRef = useRef(null);
+    const dispatch = useDispatch();
+    const [form, setForm] = useState({ site: "", username: "", password: "" });
+    const { currentUser, error } = useSelector((state) => state.user);
     const [passwordArray, setPasswordArray] = useState(currentUser?.savedData || []);
+
     const getPasswords = async () => {
         try {
-
             const response = await fetch(`/api/user/getPasswords/${currentUser._id}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-            }).then(res => res.json());
-
-
-            setPasswordArray(response);
+            });
+            const data = await response.json();
+            setPasswordArray(data);
         } catch (error) {
             console.error("Error in fetching data:", error);
         }
-
-
     };
-
 
     useEffect(() => {
         if (error) {
             ToastNotify(error.error);
-        } dispatch(clearError());
+        }
+        dispatch(clearError());
         getPasswords();
-    }, [error])
-
+    }, [error]);
 
     const savePassword = async (event) => {
-        // Yadi form submission hai, to prevent default behavior
         event.preventDefault();
 
         if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
@@ -53,85 +46,71 @@ const Home = () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ...form, id: newId })
-            })
-            setPasswordArray([...passwordArray, { ...form, id: newId }])
-            setform({ site: "", username: "", password: "" })
+            });
+            setPasswordArray([...passwordArray, { ...form, id: newId }]);
+            setForm({ site: "", username: "", password: "" });
             ToastNotify('Password Saved!');
             getPasswords();
+        } else {
+            ToastNotify('Minimum 4 characters required');
         }
-        else {
-            ToastNotify('Minimun 4 characters required');
-        }
-    }
-
+    };
 
     const deletePassword = async (id) => {
-
-        // console.log("Deleting password with id ", id)
-        let c = confirm("Do you really want to delete this password?")
+        let c = confirm("Do you really want to delete this password?");
         if (c) {
-            await fetch(`/api/user/deleteParticularPassword/${currentUser._id}/${id}`,
-                {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id })
-                })
-            setPasswordArray(passwordArray.filter(item => item.id !== id))
-
-            ToastNotify('Password Deleted!');
-        }
-
-    }
-
-    const editPassword = async (id) => {
-
-        try {
-            setform({ ...passwordArray.filter(i => i.id === id)[0], id: id })
             await fetch(`/api/user/deleteParticularPassword/${currentUser._id}/${id}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id })
             });
-            setPasswordArray(passwordArray.filter(item => item.id !== id))
+            setPasswordArray(passwordArray.filter(item => item.id !== id));
+            ToastNotify('Password Deleted!');
+        }
+    };
 
+    const editPassword = async (id) => {
+        try {
+            setForm({ ...passwordArray.filter(i => i.id === id)[0], id: id });
+            await fetch(`/api/user/deleteParticularPassword/${currentUser._id}/${id}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id })
+            });
+            setPasswordArray(passwordArray.filter(item => item.id !== id));
         } catch (error) {
             console.error("Error deleting password:", error);
             return;
         }
-    }
-
+    };
 
     const copyText = (text) => {
         ToastNotify('Copied to clipboard!');
-        navigator.clipboard.writeText(text)
-    }
+        navigator.clipboard.writeText(text);
+    };
 
     const showPassword = () => {
         if (passwordRef.current.type === "password") {
-            passwordRef.current.type = "text"
+            passwordRef.current.type = "text";
+        } else {
+            passwordRef.current.type = "password";
         }
-        else {
-            passwordRef.current.type = "password"
-        }
-
-    }
-
+    };
 
     const handleChange = (e) => {
-        setform({ ...form, [e.target.name]: e.target.value })
-    }
-
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
 
     return (
         <>
             <ToastContainer />
-            <div className="absolute inset-0 -z-10 h-full w-full bg-=-50 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"><div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-gray-500 opacity-20 blur-[100px]"></div></div>
+            <div className="absolute inset-0 -z-10 h-full w-full bg-=-50 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+                <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-gray-500 opacity-20 blur-[100px]"></div>
+            </div>
             <div className=" p-3 md:mycontainer min-h-[88.2vh] ">
                 <h1 className='text-4xl text font-bold text-center'>
                     <span className='text-green-500'> &lt;</span>
-
                     <span>Trust</span><span className='text-green-500'>Link/&gt;</span>
-
                 </h1>
                 <p className='text-green-900 text-lg text-center'>Your own Password Manager</p>
 
@@ -162,9 +141,6 @@ const Home = () => {
                         </button>
                     </div>
                 </form>
-
-
-
 
                 <div className="passwords">
                     <h2 className='font-bold text-2xl py-4'>Your Passwords</h2>
@@ -240,14 +216,12 @@ const Home = () => {
                                     <td colSpan={4}></td>
                                 </tr>
                             )}
-
                         </tbody>
                     </table>}
                 </div>
             </div>
-
         </>
     )
 }
 
-export default Home
+export default Home;

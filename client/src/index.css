@@ -8,3 +8,50 @@
       @apply container px-40 py-16 mx-auto ;
     }
   }
+ 
+
+  
+  @keyframes spinner {
+    0%, 100% {
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1);
+    }
+  }
+  
+  .dotted-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+  
+  .dotted-spinner div {
+    width: 8px;
+    height: 8px;
+    margin: 2px;
+    color: #fff;
+    background-color: #fff;
+    border-radius: 50%;
+    animation: spinner 1.2s infinite ease-in-out both;
+  }
+  
+  .dotted-spinner div:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+  
+  .dotted-spinner div:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+  
+  /* Add the following CSS to maintain button size */
+  .submit-button {
+    position: relative;
+    height: 40px; /* Adjust based on your desired button height */
+    min-height: 40px; /* Ensure minimum height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

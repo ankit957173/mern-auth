@@ -1,15 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
+
 const initialState = {
     currentUser: null,
     loading: false,
-    error: false
+    error: false,
+    verified: false
 };
 
 const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-
         clearError: (state) => {
             state.error = false;
             state.loading = false;
@@ -18,8 +19,11 @@ const userSlice = createSlice({
             state.loading = true;
         },
         signUpSuccess: (state, action) => {
+            // console.log("signUpSuccess action payload:", action.payload);
             state.loading = false;
             state.error = false;
+            state.currentUser = action.payload; // Ensure currentUser is updated
+            state.verified = action.payload.verified
         },
         signUpFailure: (state, action) => {
             state.loading = false;
@@ -29,9 +33,11 @@ const userSlice = createSlice({
             state.loading = true;
         },
         signInSuccess: (state, action) => {
+            // console.log("signInSuccess action payload:", action.payload);
             state.currentUser = action.payload;
             state.loading = false;
             state.error = false;
+            state.verified = action.payload.verified
         },
         signInFailure: (state, action) => {
             state.loading = false;
@@ -44,6 +50,7 @@ const userSlice = createSlice({
             state.currentUser = action.payload;
             state.loading = false;
             state.error = false;
+            state.verified = action.payload.verified
         },
         updateUserFailure: (state, action) => {
             state.loading = false;
@@ -69,7 +76,7 @@ const userSlice = createSlice({
         forgotStart: (state) => {
             state.loading = true;
         },
-        forgotSucess: (state, action) => {
+        forgotSucess: (state) => {
             state.loading = false;
             state.error = false;
         },
@@ -77,17 +84,27 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-    }
+    },
 });
 
 export const {
     clearError,
-    signUpFailure, signUpStart, signUpSuccess,
-    signInStart, signInSuccess,
-    signInFailure, updateUserStart,
-    updateUserSuccess, updateUserFailure
-    , deleteUserStart, deleteUserSuccess,
+    signUpFailure,
+    signUpStart,
+    signUpSuccess,
+    signInStart,
+    signInSuccess,
+    signInFailure,
+    updateUserStart,
+    updateUserSuccess,
+    updateUserFailure,
+    deleteUserStart,
+    deleteUserSuccess,
     deleteUserFailure,
-    signOut, forgotSucess, forgotFailure, forgotStart
+    signOut,
+    forgotSucess,
+    forgotFailure,
+    forgotStart,
 } = userSlice.actions;
+
 export default userSlice.reducer;
