@@ -62,10 +62,14 @@ export default function SignIn() {
       }
       document.cookie = `access_token=${data.token}; path=/;`;
       ToastNotify('Welcome Back!!');
-      dispatch(signInSuccess(data));
-      navigate("/home");
-      document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
+      //first notify user with success message then after 2 seconds redirect to /home page
+      setTimeout(() => {
+
+        dispatch(signInSuccess(data));
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+        navigate("/home");
+      }, 2000)
     } catch (error) {
       console.log("inside catch")
       console.log("error during sign-in:", error);

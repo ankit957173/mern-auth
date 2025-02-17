@@ -1,0 +1,18 @@
+
+problems solved by dubbging
+first : password getting lost after refresh
+
+    problem occured when getting saved passwords of a particular user
+    lost after refresh solved it this also by debugging
+
+second:
+        logout is not happening after signin 
+
+third: you can update only your account || user not found error
+
+        after signup token is generated for first id
+        but in db tempuser which is a verified user this is getting storing
+        so corrected this mistake by debugging myself.
+
+New functions implemented like saving password to that particular db 
+and realtime updation of password 

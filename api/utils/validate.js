@@ -16,7 +16,8 @@ export const validateEmail = (email) => {
 export const validatePassword = (password) => {
     // ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,}$
     // Check if password length is at least 5 characters
-    if (!password || password.length < 5) return "Password must be at least 5 characters long.";
+    if (!password) return "Please enter a password.";
+    if (password.length < 5) return "Password must be at least 5 characters long.";
 
     // Check if password contains at least one special character
     if (!/(?=.*[!@#\$%\^&\*])/.test(password)) return "Password must contain at least 1 special character.";

@@ -7,6 +7,8 @@ export const test = (req, res) => {
     res.json({ message: "Api is working!" });
     console.log("/  is working");
 }
+
+
 export const updateUser = async (req, res, next) => {
     const validUsername = validateUsername(req.body.username);
     if (validUsername) return next(errorHandler(400, validUsername));
@@ -21,7 +23,10 @@ export const updateUser = async (req, res, next) => {
     if (existingEmail && existingEmail._id.toString() !== req.params.id) {
         return next(errorHandler(400, "Email already exists. Please choose a different email."));
     }
-    if (req.user.id !== req.params.id) {
+
+
+
+    if (req.user._id.toString() !== req.params.id) {
         return next(errorHandler(403, "You can update only your account!"));
     }
 
@@ -41,21 +46,18 @@ export const updateUser = async (req, res, next) => {
                 email: req.body.email,
                 password: req.body.password,
                 profilePicture: req.body.profilePicture
-
             }
         }, { new: true });
+
         const { password, ...others } = updatedUser._doc;
         res.status(200).json(others);
     } catch (error) {
         next(error);
     }
-}
-
+};
 
 export const deleteUser = async (req, res, next) => {
     try {
-        console.log('Authenticated User ID:', req.user.id); // Log the authenticated user's ID
-        console.log('Request Params ID:', req.params.id); // Log the ID from the request parameters
 
         // Check if the user is trying to delete their own account
         if (req.user.id !== req.params.id) {

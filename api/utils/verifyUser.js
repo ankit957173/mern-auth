@@ -4,16 +4,27 @@ import User from "../models/User.model.js";
 import { sendOtp } from "../utils/signUpOtp.js";
 import TemporaryUser from "../models/TemporaryUser.js";
 
-export const verifyToken = (req, res, next) => {
+
+
+export const verifyToken = async (req, res, next) => {
     const token = req.cookies.access_token;
     if (!token) return next(errorHandler(401, "You are not authenticated!"));
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return next(errorHandler(403, "Token is not valid!"));
-        console.log("User from Token:", user);
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return next(errorHandler(404, "User not found in the database."));
+        }
+
         req.user = user;
         next();
-    });
+    } catch (err) {
+        console.log("Token verification failed:", err);
+        return next(errorHandler(403, "Token is not valid!"));
+    }
 };
 
 export const verifyCode = async (req, res, next) => {
@@ -40,6 +51,7 @@ export const verifyCodeSignUp = async (req, res, next) => {
             return next(errorHandler(400, "Invalid OTP or OTP expired. Please try again."));
         }
         const newUser = new User({
+            _id: tempUser._id,
             username: tempUser.username,
             email: tempUser.email,
             password: tempUser.password,

@@ -53,19 +53,19 @@ export default function SignUp() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log("Signup response:", data);
 
       if (!data.success) {
         dispatch(signUpFailure(data));
         ToastNotify(data.message); // Notify user with the error message
         return;
       }
-
-      document.cookie = `access_token=${data.token}; path=/;`;
-
-      dispatch(signUpSuccess(data.user)); // Dispatch with user data
       ToastNotify('OTP sent to your email. Please verify it.');
-      navigate("/verify-otp"); // Redirect to OTP verification page
+      //first notify user with success message then after 2 seconds redirect to otp page
+      setTimeout(() => {
+        dispatch(signUpSuccess(data.user)); // Dispatch with user data
+        navigate("/verify-otp"); // Redirect to OTP verification page
+      }, 2000);
+
     } catch (error) {
       console.error("Error during signup:", error);
       dispatch(signUpFailure(error));

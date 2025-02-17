@@ -22,7 +22,6 @@ export default function VerifyOtp() {
                 body: JSON.stringify({ email: currentUser.email, otp }),
             });
             const data = await res.json();
-            console.log("OTP verification response:", data);
 
             if (!data.success) {
                 ToastNotify('Invalid OTP. Please try again.');
@@ -30,6 +29,8 @@ export default function VerifyOtp() {
             }
 
             ToastNotify('OTP verified successfully!');
+            document.cookie = `access_token=${data.token}; path=/;`;
+
             setTimeout(() => {
                 dispatch(signInSuccess(data.user));
                 navigate("/home"); // Redirect to profile upon successful verification
@@ -54,7 +55,6 @@ export default function VerifyOtp() {
                 body: JSON.stringify({ email: currentUser.email }),
             });
             const data = await res.json();
-            console.log("Resend OTP response:", data);
             if (!data.success) {
                 ToastNotify('Error resending OTP. Please try again.');
                 return;

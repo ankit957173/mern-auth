@@ -92,8 +92,8 @@ const UserForm = () => {
     return (
         <div className="container mx-auto px-4 py-8">
             <ToastContainer />
-            <form onSubmit={handleSubmit} className="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold mb-6">TrustLink Enquiry Form</h2>
+            <form onSubmit={handleSubmit} className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold mb-6 text-center">TrustLink Enquiry Form</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="mb-4">
                         <label className="block text-gray-700 mb-2">First Name</label>
@@ -135,7 +135,7 @@ const UserForm = () => {
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-                    <div className="mb-4 col-span-2">
+                    <div className="mb-4 col-span-1 sm:col-span-2">
                         <label className="block text-gray-700 mb-2">Email</label>
                         <input
                             type="email"
@@ -145,7 +145,7 @@ const UserForm = () => {
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-                    <div className="mb-4 col-span-2">
+                    <div className="mb-4 col-span-1 sm:col-span-2">
                         <label className="block text-gray-700 mb-2">Message</label>
                         <textarea
                             name="message"
@@ -173,6 +173,8 @@ const UserForm = () => {
             </form>
         </div>
     );
+
+
 };
 
 export default UserForm;

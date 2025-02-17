@@ -99,9 +99,9 @@ export const signin = async (req, res, next) => {
 
         const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         //password is not send in response
-        const { password: hashedPassword, ...others } = validUser._doc
+        const { password: hashedPassword, ...others } = validUser._doc;
 
-        //add cookeies
+        //add cookies
         res
             .cookie('access_token', token, cookieOptions)
             .status(200)
@@ -109,31 +109,34 @@ export const signin = async (req, res, next) => {
     } catch (error) {
         next(errorHandler(500, "Error in Signin"));
     }
-}
+};
 
 export const google = async (req, res, next) => {
     try {
-        const user = await User.findOne({ email: req.body.email })
+        const user = await User.findOne({ email: req.body.email });
         if (user) {
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+            // mark verified to true if user already exists
+            const isset = await User.findOneAndUpdate({ email: req.body.email }, { verified: true });
+            console.log("isset", isset.verified)
             const { password: hashedPassword, ...others } = user._doc;
             res
-                .cookie('access_token', token, cookieOptions)
+                .cookie('access_token', token, { httpOnly: true, maxAge: 60 * 60 * 1000 })
                 .status(200)
-                .json(user._doc);
-        }
-        else {
-            // console.log(req.body.photo)
-            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+                .json(others);
+        } else {
+            const generatedPassword = Math.random().toString(36).slice(-8) +
+                Math.random().toString(36).slice(-8);
             const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
             const newUser = new User({
-                username: req.body.name.split(" ").join("").toLowerCase()
-                    +
-                    Math.floor(Math.random() * 10000).toString()
-                , email: req.body.email,
+                username: req.body.name.split(" ").join("").toLowerCase() + Math.floor(Math.random() * 10000).toString(),
+                email: req.body.email,
                 password: hashedPassword,
-                profilePicture: req.body.photo
+                profilePicture: req.body.photo,
+                verified: true
             });
+
             await newUser.save();
             const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
             const { password: hashedPassword2, ...rest } = newUser._doc;
@@ -144,14 +147,13 @@ export const google = async (req, res, next) => {
         }
     } catch (error) {
         next(error);
-
     }
-}
+};
 
 export const signout = async (req, res, next) => {
     res.clearCookie("access_token");
     res.status(200).json("Signout Successful!");
-}
+};
 
 export const findemail = async (req, res, next) => {
     try {
@@ -172,12 +174,12 @@ export const findemail = async (req, res, next) => {
     } catch (error) {
         next(errorHandler(500, "Internal Server Error in findemail controller"));
     }
-}
+};
 
 export const updatepassword = async (req, res, next) => {
     try {
         const { password } = req.body;
-        if (!password) return next(errorHandler(400, "Please enter password"))
+        if (!password) return next(errorHandler(400, "Please enter password"));
         const passwordError = validatePassword(password);
         if (passwordError) {
             return next(errorHandler(400, passwordError));
@@ -196,7 +198,7 @@ export const updatepassword = async (req, res, next) => {
     } catch (error) {
         next(errorHandler(500, "Internal Server Error in updatepassword controller"));
     }
-}
+};
 
 export const checkVerified = async (req, res, next) => {
     try {
@@ -208,7 +210,7 @@ export const checkVerified = async (req, res, next) => {
     } catch (error) {
         next(errorHandler(500, 'Internal Server Error in checkVerified middleware'));
     }
-}
+};
 
 export const getUserProfile = async (req, res, next) => {
     try {

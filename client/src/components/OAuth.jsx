@@ -4,14 +4,12 @@ import { app } from '../firebase';
 import { useDispatch } from 'react-redux';
 import { signInSuccess } from '../redux/user/userSlice';
 import { useNavigate } from 'react-router-dom' //import useNavigate
-
-
+import { ToastNotify } from './ToastNotify';
 export default function OAuth() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
     const handleGoogleClick = async () => {
-
         try {
             const provider = new GoogleAuthProvider();
             const auth = getAuth(app);
@@ -28,16 +26,24 @@ export default function OAuth() {
                 })
             })
             const data = await res.json()
-            // console.log(data)
-            dispatch(signInSuccess(data))
-            navigate("/home")
+
+            if (data) {
+                ToastNotify('Welcome To TrustLink!!')
+                setTimeout(() => {
+                    dispatch(signInSuccess(data))
+                    navigate("/home")
+                }, 2000)
+            } else {
+                console.log("No data received from the server")
+            }
         } catch (error) {
             console.log("could not login with google", error)
         }
     }
-    return (<>
+
+    return (
         <button type='button' onClick={handleGoogleClick} className='bg-red-500 text-white p-3 rounded-lg uppercase hover:opacity-95'>
-            Continue with google</button>
-    </>
+            Continue with google
+        </button>
     )
 }
