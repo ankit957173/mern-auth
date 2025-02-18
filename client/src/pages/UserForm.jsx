@@ -128,7 +128,7 @@ const UserForm = () => {
                     <div className="mb-4">
                         <label className="block text-gray-700 mb-2">Mobile Number</label>
                         <input
-                            type="number"
+                            type="tel"
                             name="mobileNumber"
                             value={formData.mobileNumber}
                             onChange={handleChange}
