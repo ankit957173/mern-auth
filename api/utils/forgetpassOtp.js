@@ -4,8 +4,8 @@ export const sendVerificationEmail = async (email, code) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail', // You can use other email services
     auth: {
-      user: 'ankitsingh957173@gmail.com',
-      pass: 'dqsd cdbq jtlw mwim',
+      user: 'ankit.tanwar.professional@gmail.com',
+      pass: 'luja ircf pgmh buly',
     },
     tls: {
       rejectUnauthorized: false
@@ -13,7 +13,7 @@ export const sendVerificationEmail = async (email, code) => {
   });
 
   const mailOptions = {
-    from: '"TrustLink" ankitsingh957173@gmail.com',
+    from: '"TrustLink" ankit.tanwar.professional@gmail.com',
     to: email,
     subject: 'Verification Code',
     html: `<!DOCTYPE html>
