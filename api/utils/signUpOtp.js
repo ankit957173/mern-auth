@@ -4,8 +4,8 @@ export const sendOtp = async (email, code) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail', // You can use other email services
     auth: {
-      user: 'ankit.tanwar.professional@gmail.com',
-      pass: 'luja ircf pgmh buly',
+     user: process.env.SENDER_EMAIL,
+      pass: process.env.EMAIL_SECRET,
     },
     tls: {
       rejectUnauthorized: false
@@ -63,7 +63,7 @@ export const sendOtp = async (email, code) => {
       <p>Thank you for using our service. Your verification code for Sign Up is: </p>
       <h2>${code}</h2>
       <p>Please enter this code on the verification page to proceed.</p>
-      <p>Thank you,<br>The TrustLink Team</p>
+      <p>Thank you,<br>Ankit Singh Tanwar</p>
     </div>
   </div>
 </body>

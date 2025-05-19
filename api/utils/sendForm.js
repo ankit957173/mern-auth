@@ -5,8 +5,8 @@ import pdf from 'html-pdf'; // Library to generate PDF
 const transporter = nodemailer.createTransport({
     service: 'Gmail', // You can use other email services
     auth: {
-        user: 'ankit.tanwar.professional@gmail.com',
-        pass: 'luja ircf pgmh buly',
+       user: process.env.SENDER_EMAIL,
+      pass: process.env.EMAIL_SECRET,
     },
     tls: {
         rejectUnauthorized: false
@@ -143,7 +143,7 @@ export const sendform = (req, res) => {
                     <li><strong>Message:</strong> ${message}</li>
                 </ul>
                 <p>Please find the attached PDF for your reference.</p>
-                <p>Best regards,<br>TrustLink Team</p>
+                <p>Best regards,<br>Ankit Singh Tanwar</p>
             `,
             attachments: [
                 {
