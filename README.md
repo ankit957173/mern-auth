@@ -19,6 +19,8 @@ The application uses the following environment variables:
 - `JWT_SECRET`: Your JWT secret key
 - `MONGO`: Your MongoDB Atlas URL
 - `VITE_API_SECRET_KEY`: Your API secret key
+- `SENDER_EMAIL` : Email to be used to send Otps
+- `EMAIL_SECRET` : You will get it from google, Mfa must be on
 
 If anyone requests these environment variables, I will send them unconditionally.
 
